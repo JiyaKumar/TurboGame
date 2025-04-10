@@ -1,17 +1,23 @@
 using UnityEngine;
+
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
 using UnityEngine.Windows.Speech;
 using System.Collections.Generic;
 using System.Linq;
+#endif
 
 public class SpeechRecognition : MonoBehaviour
 {
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
     private KeywordRecognizer keywordRecognizer;
     private Dictionary<string, System.Action> actions;
+#endif
 
     public Player_Movement playerMovement; // Reference to your car movement script
 
     void Start()
     {
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
         actions = new Dictionary<string, System.Action>();
 
         // Add words that will trigger movement
@@ -23,13 +29,16 @@ public class SpeechRecognition : MonoBehaviour
         keywordRecognizer = new KeywordRecognizer(actions.Keys.ToArray());
         keywordRecognizer.OnPhraseRecognized += OnSpeechRecognized;
         keywordRecognizer.Start();
+#endif
     }
 
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
     void OnSpeechRecognized(PhraseRecognizedEventArgs speech)
     {
         Debug.Log("Recognized: " + speech.text);
         actions[speech.text].Invoke();
     }
+#endif
 
     void MoveCar()
     {
@@ -45,11 +54,12 @@ public class SpeechRecognition : MonoBehaviour
 
     void OnDestroy()
     {
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
         if (keywordRecognizer != null)
         {
             keywordRecognizer.Stop();
             keywordRecognizer.Dispose();
         }
+#endif
     }
 }
-
