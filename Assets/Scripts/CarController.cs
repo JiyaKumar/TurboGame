@@ -1,32 +1,67 @@
-using System.Collections;
-using System.Collections.Generic;// Scripts/CarController.cs
 using UnityEngine;
-using FlutterUnityIntegration;
 
 public class CarController : MonoBehaviour
 {
-    public GameObject playerCar;
-    private float baseSpeed = 5f;
+    public float moveSpeed = 5f;
+    public float turnSpeed = 100f;
+
+    private string currentCommand = "";
+    private Rigidbody2D rb;
 
     void Start()
     {
-        UnityMessageManager.Instance.OnMessage += OnFlutterMessage;
+        rb = GetComponent<Rigidbody2D>();
     }
 
-    void OnFlutterMessage(string message)
+    void Update()
     {
-        float accuracy;
-        if (float.TryParse(message, out accuracy))
+        HandleMovement();
+    }
+
+    void HandleMovement()
+    {
+        Vector2 moveDirection = Vector2.zero;
+        float rotation = 0f;
+
+        switch (currentCommand.ToLower())
         {
-            float speed = baseSpeed * (accuracy / 100f);
-            Debug.Log("Received accuracy: " + accuracy + ", Speed: " + speed);
-            playerCar.GetComponent<Car_Movement>().speed = speed;
+            case "go":
+            case "forward":
+                moveDirection = transform.up;
+                break;
 
+            case "back":
+            case "reverse":
+                moveDirection = -transform.up;
+                break;
+
+            case "left":
+                rotation = turnSpeed * Time.deltaTime;
+                break;
+
+            case "right":
+                rotation = -turnSpeed * Time.deltaTime;
+                break;
+
+            case "stop":
+                moveDirection = Vector2.zero;
+                rb.linearVelocity = Vector2.zero;
+                rb.angularVelocity = 0f;
+                return;
+
+            default:
+                return;
         }
+
+        // Apply movement
+        rb.MovePosition(rb.position + moveDirection * moveSpeed * Time.deltaTime);
+        rb.MoveRotation(rb.rotation + rotation);
     }
 
-    private void OnDestroy()
+    // This method will be called from your speech manager
+    public void OnVoiceCommandReceived(string command)
     {
-        UnityMessageManager.Instance.OnMessage -= OnFlutterMessage;
+        currentCommand = command;
+        Debug.Log("Voice Command Received: " + command);
     }
 }
