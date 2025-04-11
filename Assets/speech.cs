@@ -15,6 +15,7 @@ public class Speech : MonoBehaviour
     public TMP_Text accuracyText;
     public TMP_Text feedbackText;
     public TMP_Dropdown levelDropdown;
+    public CarController car; // 🔥 Link to your car controller
 
     private DictationRecognizer dictationRecognizer;
     private string currentTargetSentence = "";
@@ -75,6 +76,7 @@ public class Speech : MonoBehaviour
         currentTargetSentence = currentLevelSentences[UnityEngine.Random.Range(0, currentLevelSentences.Count)].Trim();
         targetWords = Regex.Split(currentTargetSentence, "\\s+");
         UpdateTargetTextUI();
+        car.ResetSpeed(); // Reset car speed for new challenge
     }
 
     void StartDictation()
@@ -165,11 +167,13 @@ public class Speech : MonoBehaviour
         if (accuracy == 100f)
         {
             feedbackText.text = "✅ Correct! Great job!";
+            car.BoostSpeed(); // 🎯 Boost car when spoken perfectly
             Invoke("SetNewTargetSentence", 2f);
         }
         else
         {
             feedbackText.text = "❌ Try again!";
+            car.SlowDown(); // 💢 Slow down car when it's not fully correct
         }
     }
 

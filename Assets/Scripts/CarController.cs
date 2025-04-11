@@ -3,65 +3,41 @@ using UnityEngine;
 public class CarController : MonoBehaviour
 {
     public float moveSpeed = 5f;
+    public float boostedSpeed = 10f;
     public float turnSpeed = 100f;
 
-    private string currentCommand = "";
     private Rigidbody2D rb;
+    private float currentSpeed;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        currentSpeed = moveSpeed;
     }
 
     void Update()
     {
-        HandleMovement();
+        Vector2 moveDir = transform.up;
+        rb.MovePosition(rb.position + moveDir * currentSpeed * Time.deltaTime);
     }
 
-    void HandleMovement()
+    public void BoostSpeed()
     {
-        Vector2 moveDirection = Vector2.zero;
-        float rotation = 0f;
+        currentSpeed = boostedSpeed;
+    }
+    
+    public void ResetSpeed()
+{
+    currentSpeed = moveSpeed;
+}
 
-        switch (currentCommand.ToLower())
-        {
-            case "go":
-            case "forward":
-                moveDirection = transform.up;
-                break;
-
-            case "back":
-            case "reverse":
-                moveDirection = -transform.up;
-                break;
-
-            case "left":
-                rotation = turnSpeed * Time.deltaTime;
-                break;
-
-            case "right":
-                rotation = -turnSpeed * Time.deltaTime;
-                break;
-
-            case "stop":
-                moveDirection = Vector2.zero;
-                rb.linearVelocity = Vector2.zero;
-                rb.angularVelocity = 0f;
-                return;
-
-            default:
-                return;
-        }
-
-        // Apply movement
-        rb.MovePosition(rb.position + moveDirection * moveSpeed * Time.deltaTime);
-        rb.MoveRotation(rb.rotation + rotation);
+    public void SlowDown()
+    {
+        currentSpeed = moveSpeed / 2f;
     }
 
-    // This method will be called from your speech manager
-    public void OnVoiceCommandReceived(string command)
+    public float GetCurrentSpeed()
     {
-        currentCommand = command;
-        Debug.Log("Voice Command Received: " + command);
+        return currentSpeed * 10f; // Scale it for UI
     }
 }
