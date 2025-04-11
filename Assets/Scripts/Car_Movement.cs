@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class Car_Movement : MonoBehaviour
 {
-    public Transform carTransform;
-
+    public Transform transform;
     public float speed=4f;
     void Start()
     {
